@@ -1,25 +1,24 @@
-from flask import Flask, json, request, Response, abort
+from vibora import Vibora, Request
+from vibora.responses import JsonResponse
+from nltkpiidetector.piidetector import PiiDetector
+import json
 
-app = Flask(__name__)
+app = Vibora()
 
+@app.route('/spacy_ner',methods=['POST'])
+async def spacy_ner(request: Request):
+        json = await request.json()
+        json_str = json.dump(json)
+        entities = PiiDetector().getEntites(json_str)
+        return JsonResponse(entities)
 
-@app.route("/pii", methods=['POST'])
-def validate():
+@app.route('/spacy_regex',methods=['POST'])
+async def spacy_ner(request: Request):
+        json = await request.json()
+        json_str = json.dump(json)
+        entities = PiiDetector().getpatterns(json_str)
+        return JsonResponse(entities)
 
-    output.set_level(True)
-    req = request.headers.items()
-    output.info('\n'.join('{}: {}'.format(k, v) for k, v in req))
-    output.info("Message Body: " + str(request.data))
-
-
-        resp = Response("{ \"valid\": \"" + str(result.is_valid) + "\"," +
-                        "\"errors\":" + json.dumps(errors) + "}")
-        resp.headers['Content-Type'] = 'application/json'
-        return resp
-
-    abort(400)
-
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8013))
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=8001)
 
