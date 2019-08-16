@@ -5,14 +5,14 @@ import json
 
 app = Vibora()
 
-@app.route('/spacy_ner',methods=['POST'])
+@app.route('/nltk_ner',methods=['POST'])
 async def spacy_ner(request: Request):
         json = await request.json()
         json_str = json.dump(json)
         entities = PiiDetector().getEntites(json_str)
         return JsonResponse(entities)
 
-@app.route('/spacy_regex',methods=['POST'])
+@app.route('/nltk_regex',methods=['POST'])
 async def spacy_ner(request: Request):
         json = await request.json()
         json_str = json.dump(json)
