@@ -23,7 +23,7 @@ class PiiDetector:
         def __init__(self,entity):
             self.entity = entity
 
-        def toPacket():
+        def toPacket(self):
             return {"text" : self.entity.text, "start":  self.entity.start_char, "end": self.entity.end_char, "label": self.entity.label_}
     
     class RE_Entity:
@@ -31,9 +31,9 @@ class PiiDetector:
             self.entity = entity
             self.type = type
 
-        def toPacket():
+        def toPacket(self):
             start, end = self.entity.span()
-            return {"text" : self.entity.match, "start":  start, "end": end, "label": self.entity.type}
+            return {"text" : self.entity.group(), "start":  start, "end": end, "label": self.type}
 
 
     patterns = [{"CREDITCARD":CREDIT_CARD_PATTERN}, { "SSN": SSN_PATTERN}, {"PHONE" : PHONE_NUMBER_PATTERN}, { "EMAIL": EMAIL_PATTERN} ]
@@ -43,7 +43,7 @@ class PiiDetector:
         entities = []
         nstr = text
         for p in self.patterns:
-            for k, v in p:
+            for k, v in p.items():
                 regex = re.compile(v)
                 offset = 0
                 for m in regex.finditer(nstr):
@@ -52,7 +52,7 @@ class PiiDetector:
                     end = end - offset
                     nstr = nstr[:start] + nstr[end:]
                     offset = end-start
-                    entities.append(RE_Entity(m, k).toPacket())
+                    entities.append(self.RE_Entity(m, k).toPacket())
         return entities                
 
     def getEntites(self, text):
@@ -62,8 +62,6 @@ class PiiDetector:
                     
             tags = nltk.pos_tag(tokens)
 
-            print(tags)
-            print (places)
             idx = 0
             for chunk in nltk.ne_chunk(tags):
 
@@ -76,17 +74,16 @@ class PiiDetector:
                         entities.append({"text" :name, "start": start, "end": end, "label": chunk.label()})
 
                  idx = idx + 1
-            
             return entities
 
 
 
 
 def main():
- print (PiiDetector().getEntites("WASHINGTON -- In 444-22-3333 the wake of a string of abuses by New York police officers in the 1990s, " +
+ PiiDetector().getEntites("WASHINGTON -- In 444-22-3333 the wake of a string of abuses by New York police officers in the 1990s, " +
  "Loretta E. Lynch, the top federal (233) 423-2323 prosecutor in Brooklyn, spoke forcefully about the pain" + 
  "of a broken trust that 4444-4444-4444-4444 African-Americans test.tst@test.com  4555-4444-4444-4444felt and said the responsibility for repairing " +
- "generations of miscommunication and mistrust fell to law enforcement."))
+ "generations of miscommunication and mistrust fell to law enforcement.")
 
 #  PiiDetector().getEntites("WASHINGTON -- In 444-22-3333  4444-4444-4444-4444 African-Americans test.tst@test.com  4555-4444-4444-4444felt and said the responsibility")
 if __name__ == '__main__':

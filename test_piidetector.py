@@ -61,14 +61,14 @@ def test_credit_card(credit_card, expected):
     assert bool(re.search(CREDIT_CARD_PATTERN, credit_card)) == expected
 
 #https://gist.github.com/cgudea/7c558138cb48b36e785b
-DMS_LATITUDE_PATTERN = "-?((90\/[0]{0,}\/[0]{0,}$)|([1-8]?\d))(\/|\:|\ )(([1-5]?\d))(\/|\:|\ )[1-5]?\d(\.\d{0,})"
+DMS_LATITUDE_PATTERN = "^-?((90\/[0]{0,}\/[0]{0,}$)|([1-8]?\d))(\/|\:|\ )(([1-5]?\d))(\/|\:|\ )[1-5]?\d(\.\d{0,})?$"
 
-@pytest.mark.parametrize("lattitude, expected",
+@pytest.mark.parametrize("latitude, expected",
 [
   ( '-12/23/59.999999999999999', True),
   ( '-1/2/1.000234', True),
   ( '-1:2:12.000234', True), 
-	( '0 59 0.22', True),
+  ( '0 59 0.22', True),
   ( '60/34/34', True),
   ( '20/60/0', False),
   ( '80/60/1.11', False), 
@@ -80,7 +80,7 @@ def test_dms_latitude_pattern(latitude, expected):
     assert bool(re.search(DMS_LATITUDE_PATTERN, latitude)) == expected
 
 #https://gist.github.com/cgudea/7c558138cb48b36e785b
-DMS_LONGTITUDE_PATTERN =  "-?((180(\/|\:| )0(\/|\:| )0((\.0{0,})?))|(([1]?[1-7]\d)|\d?\d)(\/|\:| )([1-5]?\d)(\/|\:| )[1-5]?\d(\.\d{0,})?"
+DMS_LONGTITUDE_PATTERN =  "^-?((180(\/|\:| )0(\/|\:| )0((\.0{0,})?))|(([1]?[1-7]\d)|\d?\d)(\/|\:| )([1-5]?\d)(\/|\:| )[1-5]?\d(\.\d{0,})?$)"
 @pytest.mark.parametrize("longtitude, expected",
 [('123:60:59.99999999', False),
  ('-180:12:0', False),
@@ -103,7 +103,7 @@ def test_dms_longtitude_pattern(longtitude, expected):
     assert bool(re.search(DMS_LONGTITUDE_PATTERN, longtitude)) == expected
 
 
-DECIMAL_LATITUDE_LONGTITUDE_PATTERN = "-?(180((\.0{0,})?)|([1]?[0-7]?\d(\.\d{0,})?))"
+DECIMAL_LATITUDE_LONGTITUDE_PATTERN = "^-?(180((\.0{0,})?)|([1]?[0-7]?\d(\.\d{0,})?))$"
 @pytest.mark.parametrize("location, expected",
 [
  ("323.312.0", False),
