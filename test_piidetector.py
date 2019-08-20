@@ -77,11 +77,11 @@ DMS_LATITUDE_PATTERN = "-?((90\/[0]{0,}\/[0]{0,}$)|([1-8]?\d))(\/|\:|\ )(([1-5]?
   ( '86/60/1', False)
 ])
 def test_dms_latitude_pattern(latitude, expected):
-    assert bool(re.search(DMS_LATITUDE_PATTERN, expected)) == expected
+    assert bool(re.search(DMS_LATITUDE_PATTERN, latitude)) == expected
 
 #https://gist.github.com/cgudea/7c558138cb48b36e785b
-DMS_LONGTITUDE_PATTERN =  "-?((90\/[0]{0,}\/[0]{0,}$)|([1-8]?\d))(\/|\:|\ )(([1-5]?\d))(\/|\:|\ )[1-5]?\d(\.\d{0,})"
-@pytest.mark.parametrize("latitude, expected",
+DMS_LONGTITUDE_PATTERN =  "-?((180(\/|\:| )0(\/|\:| )0((\.0{0,})?))|(([1]?[1-7]\d)|\d?\d)(\/|\:| )([1-5]?\d)(\/|\:| )[1-5]?\d(\.\d{0,})?"
+@pytest.mark.parametrize("longtitude, expected",
 [('123:60:59.99999999', False),
  ('-180:12:0', False),
  ('180:60:0', False),
@@ -100,6 +100,52 @@ DMS_LONGTITUDE_PATTERN =  "-?((90\/[0]{0,}\/[0]{0,}$)|([1-8]?\d))(\/|\:|\ )(([1-
  ('-0 0 0.00001', True)
  ])
 def test_dms_longtitude_pattern(longtitude, expected):
-    assert bool(re.search(DMS_LONGTITUDE_PATTERN, expected)) == expected
+    assert bool(re.search(DMS_LONGTITUDE_PATTERN, longtitude)) == expected
 
-    
+
+DECIMAL_LATITUDE_LONGTITUDE_PATTERN = "-?(180((\.0{0,})?)|([1]?[0-7]?\d(\.\d{0,})?))"
+@pytest.mark.parametrize("location, expected",
+[
+ ("323.312.0", False),
+ ("ABC", False),
+ ("abc", False),
+ ("2.a23", False),
+ ("e2.31", False),
+ ("123-213", False),
+ ("-123e", False),
+ ("180.1", False),
+ ("-190",False),
+ ("-200.1",False),
+ ("-22.311", True),
+ ("-12", True),
+ ("-170", True),
+ ("28.324125", True), 
+ ("179.0111111111111", True),
+ ("13", True),
+ ("-100.0", True)
+ ])
+def test_decimal_pattern(location, expected):
+   assert bool(re.search(DECIMAL_LATITUDE_LONGTITUDE_PATTERN, location)) == expected
+
+
+UTM_PATTERN = "\d(\/|\:| |)[^aboiyzABOIYZ\d\[-\` -@](\/|\:| |)\d{2,}"
+@pytest.mark.parametrize("utm, expected",
+[
+    ('4Q6109372363778', True),
+    ('1f21', True), 
+    ('2e01928391087509127405123521353526798', True), 
+	('4:Q6109372363778', True), 
+    ('4/Q/6109372363778', True), 
+    ('4 Q 6109372363778', True), 
+    ('1 e 231', True),
+    ('4a6109372363778', False),
+    ('asljkd', False),
+    ('123f', False),
+    ('1a21', False),
+    ('1234',False),
+    ('1/2:123',False),
+    ('1:./21', False),
+    ('1 a 1234', False)
+])
+def test_utm_pattern(utm, expected):
+   assert bool(re.search(UTM_PATTERN, utm)) == expected
